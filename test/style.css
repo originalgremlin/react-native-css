@@ -1,5 +1,5 @@
 description {
-	flex: 1;
+	flex: 12345;
 	margin: 2, 3, 4;
 	font-size: 18;
 	text-align: center;
@@ -7,8 +7,7 @@ description {
 }
 
 container {
-
-	padding: 30;
+	padding: 5;
 	margin-top: 65;
 	align-items: center;
 }

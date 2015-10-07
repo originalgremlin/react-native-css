@@ -1,50 +1,54 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
-	value: true
-});
+var css = require('css'),
+    fs = require('fs'),
+    indentation = 4,
+    less = require('less'),
+    path = require('path'),
+    sass = require('node-sass'),
+    toCamelCase = require('to-camel-case'),
+    util = require('util');
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+module.exports = {
+    parse: function (file, cb) {
+        var input = fs.readFileSync(file, { encoding: 'utf8' });
+        switch (path.extname(file)) {
+            case '.css':
+                cb(null, renderReactNative(input));
+                break;
+            case '.less':
+                less.render(input, function (err, result) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        cb(null, renderReactNative(result.css));
+                    }
+                });
+                break;
+            case '.sass':
+            case '.scss':
+                sass.render({ data: input }, function (err, result) {
+                    if (err) {
+                        cb(err, null);
+                    } else {
+                        cb(null, renderReactNative(result));
+                    }
+                });
+                break;
+            default:
+                cb('Unrecognized file format', null);
+                break;
+        }
+    }
+};
 
-var _cssParse = require('css-parse');
+var renderReactNative = function (input) {
+    var stylesheet = css.parse(input),
+        result = {};
+    return util.format("module.exports = require('react-native').StyleSheet.create(%s);", JSON.stringify(result, null, 4));
+};
 
-var _cssParse2 = _interopRequireDefault(_cssParse);
-
-var _toCamelCase = require('to-camel-case');
-
-var _toCamelCase2 = _interopRequireDefault(_toCamelCase);
-
-var _fs = require('fs');
-
-var _fs2 = _interopRequireDefault(_fs);
-
-exports['default'] = {
-
-	parse: function parse(input) {
-		var _this = this;
-
-		var output = arguments.length <= 1 || arguments[1] === undefined ? './style.js' : arguments[1];
-		var prettyPrint = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-
-		if (input.indexOf('.scss') > 1) {
-			var _require$renderSync = require('node-sass').renderSync({
-				file: input,
-				outputStyle: 'compressed'
-			});
-
-			var css = _require$renderSync.css;
-
-			var styleSheet = this.handleRulesAndReturnCSSJSON(css.toString());
-			return helpers.outputReactFriendlyStyle(styleSheet, output, prettyPrint);
-		} else {
-
-			helpers.readFile(input, function (err, data) {
-				var styleSheet = _this.handleRulesAndReturnCSSJSON(data);
-				helpers.outputReactFriendlyStyle(styleSheet, output, prettyPrint);
-			});
-		}
-	},
-
+/*
 	handleRulesAndReturnCSSJSON: function handleRulesAndReturnCSSJSON(stylesheetString) {
 
 		var changeArr = ['margin', 'padding'];
@@ -87,10 +91,10 @@ exports['default'] = {
 								var declaration = _step3.value;
 
 								if (declaration.type !== 'declaration') return {
-										v: {
-											v: undefined
-										}
-									};
+									v: {
+										v: undefined
+									}
+								};
 
 								var value = declaration.value;
 								var property = declaration.property;
@@ -99,7 +103,7 @@ exports['default'] = {
 									baseDeclaration = {
 										type: 'description'
 									};
-									values = value.replace(/px|\s*/g, '').split(',');
+									values = value.replace(/px|\s* /g, '').split(',');
 
 									values.forEach(function (value, index, arr) {
 										arr[index] = parseInt(value);
@@ -246,33 +250,4 @@ exports['default'] = {
 		return JSONResult;
 	}
 };
-
-var helpers = {
-
-	indexOf: function indexOf(value, arr) {
-		var flag = false;
-		for (var i = 0; i < arr.length; i++) {
-			if (value === arr[i]) {
-				return true;
-			}
-		}
-		return flag;
-	},
-
-	clean: function clean(string) {
-		return string.replace(/\r?\n|\r/g, "");
-	},
-
-	readFile: function readFile(file, cb) {
-		_fs2['default'].readFile(file, "utf8", cb);
-	},
-
-	outputReactFriendlyStyle: function outputReactFriendlyStyle(style, outputFile, prettyPrint) {
-		var indentation = prettyPrint ? 4 : 0;
-		var wstream = _fs2['default'].createWriteStream(outputFile);
-		wstream.write('module.exports = require(\'react-native\').StyleSheet.create(' + JSON.stringify(style, null, indentation) + ');');
-		wstream.end();
-		return style;
-	}
-};
-module.exports = exports['default'];
+*/

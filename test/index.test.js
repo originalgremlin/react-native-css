@@ -1,4 +1,4 @@
-var css = require('../build/index.js');
+var css = require('../index');
 
 css.parse('./test/style.css', './test/style-css.js');
 css.parse('./test/style.scss', './test/style-scss.js');

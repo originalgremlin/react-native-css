@@ -1,42 +1,62 @@
 #!/usr/bin/env node
-var rnc = require('../build/index.js');
-var pkg = require('../package.json');
-var path = require('path');
-var fs = require('fs');
-var argv = require('minimist')(process.argv.slice(2));
 
-var help = argv['h'] || argv['help'];
-var watch = argv['w'] || argv['watch'];
-var prettyPrint = argv['p'] || argv['pretty'] ? true : false;
+var css = require('../index'),
+    fs = require('fs'),
+	path = require('path'),
+    watch = require('watch');
 
-if(argv['i'] && argv['o']) {
-	console.log('React-native-css - v' + pkg.version);
-
-	var input = path.resolve(process.cwd(), argv['i']);
-	var output = path.resolve(process.cwd(), argv['o']);
-
-	rnc.parse(input, output, prettyPrint);
-
-	if(watch) {
-		console.log('Watching for changes on: ', argv['i']);
-		console.log('ctrl + c to exit');
-
-		fs.watch(process.cwd(), function (event, filename) {
-			var isSass = filename.indexOf('scss') > -1;
-
-			if (filename === argv['i'] || isSass) {
-				console.log(filename, ' compiling');
-
-				rnc.parse(input, output, prettyPrint);
-			}
-		});
-
+var argv = require('minimist')(process.argv.slice(2), {
+	string: ['input', 'output'],
+	default: {
+		input: '.',
+		output: '.'
+	},
+	unknown: function (param) {
+		return false;
 	}
-}
+});
 
-if(help) {
-	console.log('React-native-css - v' + pkg.version);
-	console.log('\nCompile and watch: \n ./node_modules/.bin/react-native-css -i INPUT_CSS_FILE_AND_FULLPATH -o OUTPUT_JS_FILE -w  \nCompile once: \n./node_modules/.bin/react-native-css -i INPUT_CSS_FILE_AND_FULLPATH -o OUTPUT_JS_FILE\n ')
-	console.log('real example: ./node_modules/.bin/react-native-css -i ../css/main.css -o ../styles/main.js -w ');
+var input = path.resolve(argv['input']);
 
-}
+var parse = function (file) {
+    var outfile = getOutfile(file);
+    css.parse(file, function (err, result) {
+        if (err) {
+            console.log('Error compiling ' + file);
+        } else {
+            fs.writeFile(outfile, result, { encoding: 'utf8' }, function (err) {
+                if (err) {
+                    console.log('Error writing ' + file);
+                } else {
+                    console.log('Compiled ' + file);
+                }
+            });
+        }
+    });
+};
+
+var getOutfile = function (infile) {
+    var ext = path.extname(infile),
+        outfile = path.resolve(argv['output'], path.relative(input, infile)),
+        js = outfile.slice(0, -ext.length) + '.js';
+    return js;
+};
+
+watch.createMonitor(input, {}, function (monitor) {
+    console.log('Watching for changes on:', input);
+    console.log('Type "Ctrl + C" to exit.');
+
+    monitor.on('created', function (file, stat) {
+        parse(file);
+    });
+
+    monitor.on('changed', function (file, curr, prev) {
+        parse(file);
+    });
+
+    monitor.on('removed', function (file, stat) {
+        var outfile = getOutfile(file);
+        console.log('Deleting ' + outfile);
+        fs.unlink(outfile);
+    });
+});
