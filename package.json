@@ -21,6 +21,9 @@
   "bin": {
     "react-native-css": "./bin/react-native-css"
   },
+  "scripts": {
+    "test": "test/run 2>/dev/null"
+  },
   "dependencies": {
     "css": "^2.2.1",
     "less": "^2.5.3",

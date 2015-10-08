@@ -17,8 +17,6 @@ var argv = require('minimist')(process.argv.slice(2), {
 	}
 });
 
-var input = path.resolve(argv['input']);
-
 var parse = function (file) {
     var outfile = getOutfile(file);
     css.parse(file, function (err, result) {
@@ -37,8 +35,9 @@ var parse = function (file) {
 };
 
 var getOutfile = function (infile) {
-    var ext = path.extname(infile),
-        outfile = path.resolve(argv['output'], path.relative(input, infile)),
+    var indir = path.resolve(argv['input']),
+        outfile = path.resolve(argv['output'], path.relative(indir, infile)),
+        ext = path.extname(infile),
         js = outfile.slice(0, -ext.length) + '.js';
     return js;
 };
