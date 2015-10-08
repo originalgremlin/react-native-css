@@ -1,14 +1,14 @@
 {
-  "name": "react-native-css",
+  "name": "react-native-styles",
   "version": "1.0.0",
   "description": "CSS style your React Components",
   "author": "Barry Shapira <barry.shapira@gmail.com",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/originalgremlin/react-native-css"
+    "url": "https://github.com/originalgremlin/react-native-styles"
   },
-  "homepage": "https://github.com/originalgremlin/react-native-css",
+  "homepage": "https://github.com/originalgremlin/react-native-styles",
   "keywords": [
     "react",
     "react-native",
@@ -19,7 +19,7 @@
     "android"
   ],
   "bin": {
-    "react-native-css": "./bin/react-native-css"
+    "react-native-styles": "./bin/react-native-styles"
   },
   "scripts": {
     "test": "test/run 2>/dev/null"
