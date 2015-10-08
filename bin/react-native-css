@@ -3,7 +3,8 @@
 var css = require('../index'),
     fs = require('fs'),
 	path = require('path'),
-    watch = require('watch');
+    watch = require('watch'),
+    util = require('util');
 
 var argv = require('minimist')(process.argv.slice(2), {
 	string: ['input', 'output'],
@@ -22,13 +23,13 @@ var parse = function (file) {
     var outfile = getOutfile(file);
     css.parse(file, function (err, result) {
         if (err) {
-            console.log('Error compiling ' + file);
+            console.log(util.format('Error compiling %s: %s', file, err));
         } else {
             fs.writeFile(outfile, result, { encoding: 'utf8' }, function (err) {
                 if (err) {
-                    console.log('Error writing ' + file);
+                    console.log(util.format('Error writing %s: %s', file, err));
                 } else {
-                    console.log('Compiled ' + file);
+                    console.log(util.format('Compiled %s', file));
                 }
             });
         }

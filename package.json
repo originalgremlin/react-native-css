@@ -24,9 +24,9 @@
   "dependencies": {
     "css": "^2.2.1",
     "less": "^2.5.3",
+    "lodash": "^3.10.1",
     "minimist": "^1.2.0",
     "node-sass": "^3.3.3",
-    "to-camel-case": "^0.2.1",
     "watch": "^0.16.0"
   }
 }
