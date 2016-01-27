@@ -59,44 +59,8 @@ var mapProperties = function (rule) {
 };
 
 var parseDeclaration = function (declaration) {
-    // TODO: object types
-    // TODO: multiple values for margin, padding (2 3 -> 2 2 3 3)
-    // TODO: special treatment for shadowOffset, transform
 	var name = _.camelCase(declaration.property),
-		value = declaration.value,
-		propType = properties[name];
-	if (_.isUndefined(propType)) {
-        // unknown
-        console.error(util.format('Unknown property "%s"', name));
-		value = undefined;
-	} else if (_.isEqual(propType, 'number')) {
-        // number
-        var match = value.match(/^(\d+)/);
-        if (_.isNull(match)) {
-            console.error(util.format('Invalid value "%s" for integer property "%s"', value, name));
-            value = undefined;
-        } else {
-            value = parseInt(match[1]);
-        }
-	} else if (_.isEqual(propType, 'string')) {
-        // string
-		value = value;
-	} else if (_.isArray(propType)) {
-        // enum
-        if (_.includes(propType, value)) {
-            value = value;
-        } else {
-            console.error(util.format('Invalid value "%s" for enum property "%s".  Valid values are [%s]', value, name, propType));
-            value = undefined;
-        }
-	} else if (_.isObject(propType)) {
-        // object
-        value = value;
-	} else {
-        // unrecognized propType.  we should never get here...
-        console.error(util.format('Unknown type "%s" for property "%s"', propType, name));
-		value = undefined;
-	}
+		value = declaration.value;
 	return [name, value];
 };
 
